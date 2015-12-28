@@ -368,7 +368,7 @@ public class CloneVisitor implements GenericVisitor<Node, Object> {
 
 		ClassOrInterfaceType r = new ClassOrInterfaceType(
 				_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(),
-				scope, _n.getName(), typeArgs
+				scope, _n.getName(), typeArgs, _n.isUsesDiamondOperator()
 		);
 		r.setComment(comment);
 		return r;
