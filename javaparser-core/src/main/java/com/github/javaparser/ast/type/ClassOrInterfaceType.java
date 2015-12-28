@@ -40,6 +40,8 @@ public final class ClassOrInterfaceType extends Type implements NamedNode {
 
     private List<Type> typeArgs;
 
+    private boolean usesDiamondOperator;
+
     public ClassOrInterfaceType() {
     }
 
@@ -53,8 +55,14 @@ public final class ClassOrInterfaceType extends Type implements NamedNode {
     }
 
     public ClassOrInterfaceType(final int beginLine, final int beginColumn, final int endLine, final int endColumn,
-            final ClassOrInterfaceType scope, final String name, final List<Type> typeArgs) {
+                                final ClassOrInterfaceType scope, final String name, final List<Type> typeArgs) {
+        this(beginLine, beginColumn, endLine, endColumn, scope, name, typeArgs, false);
+    }
+
+    public ClassOrInterfaceType(final int beginLine, final int beginColumn, final int endLine, final int endColumn,
+            final ClassOrInterfaceType scope, final String name, final List<Type> typeArgs, final boolean usesDiamondOperator) {
         super(beginLine, beginColumn, endLine, endColumn);
+        this.usesDiamondOperator = usesDiamondOperator;
         setScope(scope);
         setName(name);
         setTypeArgs(typeArgs);
@@ -80,6 +88,10 @@ public final class ClassOrInterfaceType extends Type implements NamedNode {
     public List<Type> getTypeArgs() {
         typeArgs = ensureNotNull(typeArgs);
         return typeArgs;
+    }
+
+    public boolean isUsesDiamondOperator() {
+        return usesDiamondOperator;
     }
 
     public boolean isBoxedType() {

@@ -358,3 +358,13 @@ class A {
     }
 }
 Then the Java parser cannot parse it because of lexical errors
+
+Scenario: Diamond Operator information is exposed
+
+Given a CompilationUnit
+When the following source is parsed:
+class A {
+    List<String> args = new ArrayList<>();
+}
+When I take the ObjectCreationExpr
+Then the type's uses diamond operator flag should be true

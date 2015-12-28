@@ -1807,6 +1807,7 @@ ClassOrInterfaceType ClassOrInterfaceType():
 	ClassOrInterfaceType ret;
 	String name;
 	List typeArgs = null;
+	boolean usesDiamondOperator = false;
 	int line;
 	int column;
 	List annotations = null;
@@ -1814,11 +1815,30 @@ ClassOrInterfaceType ClassOrInterfaceType():
 }
 {
   <IDENTIFIER> {line=token.beginLine; column=token.beginColumn;} { name = token.image; }
-  [ LOOKAHEAD(2) typeArgs = TypeArguments() {typeArgs.remove(0);} ]
-  { ret = new ClassOrInterfaceType(line, column, token.endLine, token.endColumn,null, name, typeArgs); }
+  [
+    LOOKAHEAD(2)
+    typeArgs = TypeArguments()
+    {
+        Object firstTypeArg = typeArgs.remove(0);
+        usesDiamondOperator = firstTypeArg instanceof String && "<>".equals(firstTypeArg);
+    }
+  ]
+  { ret = new ClassOrInterfaceType(line, column, token.endLine, token.endColumn,null, name, typeArgs, usesDiamondOperator); }
   (
 	  LOOKAHEAD(2) "." (ann = Annotation()   { annotations = add(annotations, ann);})*  <IDENTIFIER> { name = token.image; }
-	  [ LOOKAHEAD(2) typeArgs = TypeArguments() {typeArgs.remove(0);} ] { ret = new ClassOrInterfaceType(line, column, token.endLine, token.endColumn,ret, name, typeArgs); ret.setAnnotations(annotations); annotations = null; }
+	  [
+	    LOOKAHEAD(2)
+	    typeArgs = TypeArguments()
+	    {
+            Object firstTypeArg = typeArgs.remove(0);
+            usesDiamondOperator = firstTypeArg instanceof String && "<>".equals(firstTypeArg);
+	    }
+	  ]
+	  {
+	    ret = new ClassOrInterfaceType(line, column, token.endLine, token.endColumn,ret, name, typeArgs, usesDiamondOperator);
+	    ret.setAnnotations(annotations);
+	    annotations = null;
+      }
   )*
   { return ret; }
 }
