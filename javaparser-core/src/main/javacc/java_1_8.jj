@@ -1105,7 +1105,8 @@ TOKEN :
 | < RUNSIGNEDSHIFTASSIGN: ">>>=" >
 | < ELLIPSIS: "..." >
 | < ARROW: "->" >
-| < DOUBLECOLON : "::">
+| < DOUBLECOLON: "::" >
+| < DIAMOND: "<>" >
 }
 
 /* >'s need special attention due to generics syntax. */
@@ -1854,7 +1855,7 @@ List TypeArguments():
    )
    { return ret; }
  |
-   "<>" { ret.add(null); } /*dummy add null since it is always removed*/
+   <DIAMOND> { ret.add(null); } /*dummy add null since it is always removed*/
    { return ret; }
 }
 
