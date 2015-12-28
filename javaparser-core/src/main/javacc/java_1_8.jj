@@ -1105,7 +1105,7 @@ TOKEN :
 | < RUNSIGNEDSHIFTASSIGN: ">>>=" >
 | < ELLIPSIS: "..." >
 | < ARROW: "->" >
-| < DOUBLECOLON : "::">
+| < DOUBLECOLON: "::" >
 }
 
 /* >'s need special attention due to generics syntax. */
@@ -1815,26 +1815,16 @@ ClassOrInterfaceType ClassOrInterfaceType():
 }
 {
   <IDENTIFIER> {line=token.beginLine; column=token.beginColumn;} { name = token.image; }
-  [
-    LOOKAHEAD(2)
-    typeArgs = TypeArguments()
-    {
-        Object firstTypeArg = typeArgs.remove(0);
-        usesDiamondOperator = firstTypeArg instanceof String && "<>".equals(firstTypeArg);
-    }
-  ]
-  { ret = new ClassOrInterfaceType(line, column, token.endLine, token.endColumn,null, name, typeArgs, usesDiamondOperator); }
+  [ LOOKAHEAD(2) typeArgs = TypeArguments() {typeArgs.remove(0);} ]
+  {
+      usesDiamondOperator = typeArgs != null && typeArgs.isEmpty();
+      ret = new ClassOrInterfaceType(line, column, token.endLine, token.endColumn,null, name, typeArgs, usesDiamondOperator);
+  }
   (
 	  LOOKAHEAD(2) "." (ann = Annotation()   { annotations = add(annotations, ann);})*  <IDENTIFIER> { name = token.image; }
-	  [
-	    LOOKAHEAD(2)
-	    typeArgs = TypeArguments()
-	    {
-            Object firstTypeArg = typeArgs.remove(0);
-            usesDiamondOperator = firstTypeArg instanceof String && "<>".equals(firstTypeArg);
-	    }
-	  ]
+	  [ LOOKAHEAD(2) typeArgs = TypeArguments() {typeArgs.remove(0);} ]
 	  {
+	    usesDiamondOperator = typeArgs != null && typeArgs.isEmpty();
 	    ret = new ClassOrInterfaceType(line, column, token.endLine, token.endColumn,ret, name, typeArgs, usesDiamondOperator);
 	    ret.setAnnotations(annotations);
 	    annotations = null;
@@ -1869,12 +1859,9 @@ List TypeArguments():
 {
    (
      "<" { ret.add(new int[]{token.beginLine, token.beginColumn}); }
-     type = TypeArgument() { ret.add(type); } ( "," type = TypeArgument() { ret.add(type); } )*
+     (type = TypeArgument() { ret.add(type); } ( "," type = TypeArgument() { ret.add(type); } )*)?
      ">"
    )
-   { return ret; }
- |
-   "<>" { ret.add(null); } /*dummy add null since it is always removed*/
    { return ret; }
 }
 

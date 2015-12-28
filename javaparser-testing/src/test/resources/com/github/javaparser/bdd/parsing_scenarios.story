@@ -368,3 +368,13 @@ class A {
 }
 When I take the ObjectCreationExpr
 Then the type's uses diamond operator flag should be true
+
+Scenario: Diamond Operator can be parsed also with space and comments
+
+Given a CompilationUnit
+When the following source is parsed:
+class A {
+    List<String> args = new ArrayList<  /*hello*/  >();
+}
+When I take the ObjectCreationExpr
+Then the type's uses diamond operator flag should be true
